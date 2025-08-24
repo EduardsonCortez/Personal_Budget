@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Personal Budget Calculator</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- For charts -->
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f5f5f5;
+  }
+  .container {
+    width: 90%;
+    max-width: 700px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    position: relative;
+  }
+  /* Watermark Name */
+  .watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    font-size: 50px;
+    color: gray;
+    opacity: 0.1;
+    transform: translate(-50%, -50%) rotate(-30deg);
+    pointer-events: none;
+    user-select: none;
+  }
+  img.signature {
+    width: 60px;
+    height: 60px;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    border-radius: 50%;
+  }
+  input[type="number"] {
+    width: 100px;
+    padding: 5px;
+    margin: 5px;
+  }
+  button {
+    padding: 10px 20px;
+    margin-top: 10px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="watermark">Eduardson Cortez</div>
+  <img class="signature" src="myphoto.png" alt="Signature">
+  <h2>📊 Personal Budget Calculator</h2>
+  
+  <div>
+    <label>Income (₱):</label>
+    <input type="number" id="income" value="0">
+  </div>
+  
+  <div>
+    <label>Rent (₱):</label>
+    <input type="number" id="rent" value="0">
+  </div>
+  
+  <div>
+    <label>Groceries (₱):</label>
+    <input type="number" id="groceries" value="0">
+  </div>
+  
+  <div>
+    <label>Transport (₱):</label>
+    <input type="number" id="transport" value="0">
+  </div>
+  
+  <div>
+    <label>Utilities (₱):</label>
+    <input type="number" id="utilities" value="0">
+  </div>
+  
+  <div>
+    <label>Other (₱):</label>
+    <input type="number" id="other" value="0">
+  </div>
+  
+  <br>
+  <button onclick="calculateBudget()">Calculate</button>
+  
+  <h3 id="result"></h3>
+  
+  <canvas id="pieChart" width="400" height="400"></canvas>
+  <canvas id="barChart" width="400" height="400"></canvas>
+</div>
+
+<script>
+function calculateBudget() {
+  const income = parseFloat(document.getElementById('income').value);
+  const rent = parseFloat(document.getElementById('rent').value);
+  const groceries = parseFloat(document.getElementById('groceries').value);
+  const transport = parseFloat(document.getElementById('transport').value);
+  const utilities = parseFloat(document.getElementById('utilities').value);
+  const other = parseFloat(document.getElementById('other').value);
+
+  const totalExpenses = rent + groceries + transport + utilities + other;
+  const remaining = income - totalExpenses;
+
+  let advice = '';
+  if(remaining > 0) advice = '✅ Good job! You still have money left for savings. 💰';
+  else if(remaining === 0) advice = '⚠️ Careful! Your income equals your expenses.';
+  else advice = '❌ Warning! You are overspending. Please adjust your budget.';
+
+  document.getElementById('result').innerHTML = `
+    Total Income: ₱${income.toLocaleString()}<br>
+    Total Expenses: ₱${totalExpenses.toLocaleString()}<br>
+    Remaining Budget: ₱${remaining.toLocaleString()}<br>
+    ${advice}
+  `;
+
+  // Charts
+  const labels = ["Rent", "Groceries", "Transport", "Utilities", "Other", "Remaining"];
+  const values = [rent, groceries, transport, utilities, other, remaining];
+
+  // Pie Chart
+  new Chart(document.getElementById('pieChart'), {
+    type: 'pie',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: values,
+        backgroundColor: ["#ff9999","#66b3ff","#99ff99","#ffcc99","#c2c2f0","#ffd966"]
+      }]
+    },
+    options: {
+      plugins: { legend: { position: 'bottom' } }
+    }
+  });
+
+  // Bar Chart
+  new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Amount (₱)',
+        data: values,
+        backgroundColor: ["#ff9999","#66b3ff","#99ff99","#ffcc99","#c2c2f0","#ffd966"]
+      }]
+    },
+    options: { scales: { y: { beginAtZero: true } } }
+  });
+}
+</script>
+</body>
+</html>
